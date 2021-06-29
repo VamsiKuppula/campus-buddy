@@ -4,14 +4,14 @@ const router = express.Router();
 
 const postController = require('../controllers/postController');
 const authController = require('../controllers/authController');
+const responseRouter = require('./responseRoutes');
+
+router.use('/:postId/responses', responseRouter);
+router.use(authController.protect);
 
 router
   .route('/')
-  .get(
-    authController.protect,
-    authController.restrictTo('admin'),
-    postController.getAllPosts
-  )
+  .get(postController.getAllPosts)
   .post(postController.createPost);
 
 router

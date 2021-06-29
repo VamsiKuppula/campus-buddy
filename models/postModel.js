@@ -5,7 +5,8 @@ const AppError = require('../utils/appError');
 const postSchema = new mongoose.Schema(
   {
     author: {
-      type: String,
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
       required: [true, 'A post must have an author'],
     },
     title: {
@@ -68,17 +69,27 @@ const postSchema = new mongoose.Schema(
         message: 'Section must be either: a, b',
       },
     },
-  } /*,
+    createdAt: {
+      type: Date,
+      default: Date.now(),
+    },
+  },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }*/
+  }
 );
 /*
 postSchema.virtual('curYear').get(function () {
   if (this.year === -1) return null;
   const curDate = new Date();
   return curDate.getFullYear() * 1 - this.year;
+});
+
+postSchema.virtual('responses', {
+  ref: 'Response',
+  foreignField: 'post',
+  localField: '_id',
 });
 */
 
@@ -121,6 +132,19 @@ postSchema.pre('save', function (next) {
         )
       );
   }
+  next();
+});
+
+postSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'author',
+    select: '-__v -passwordChangedAt',
+  });
+
+  this.populate({
+    path: 'responses',
+    select: '-__v',
+  });
   next();
 });
 

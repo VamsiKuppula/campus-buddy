@@ -1,101 +1,24 @@
 const Post = require('../models/postModel');
-const ApiFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 
-exports.getAllPosts = catchAsync(async (req, res, next) => {
-  const features = new ApiFeatures(Post.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-
-  const posts = await features.query;
-
-  res.status(200).json({
-    message: 'success',
-    requestedAt: req.requestTime,
-    results: posts.length,
-    data: { posts },
-  });
+exports.getAllPosts = factory.getAll(Post);
+exports.createPost = factory.createOne(Post);
+exports.getPost = factory.getOne(Post, {
+  path: 'responses',
+  foreignField: 'post',
+  localField: '_id',
 });
+exports.updatePost = factory.updateOne(Post);
 
-exports.createPost = catchAsync(async (req, res, next) => {
-  const newPost = await Post.create(req.body);
-  res.status(201).json({
-    message: 'success',
-    data: {
-      post: newPost,
-    },
-  });
-});
-
-exports.getPost = catchAsync(async (req, res, next) => {
-  const post = await Post.findById(req.params.id);
-
-  if (!post) {
-    return next(
-      new AppError('No post found with that id.', 404)
-    );
-  }
-
-  res.status(200).json({
-    message: 'success',
-    data: {
-      post,
-    },
-  });
-});
-
-exports.updatePost = catchAsync(async (req, res, next) => {
-  const post = await Post.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    {
-      runValidators: true,
-      new: true,
-    }
-  );
-
-  if (!post) {
-    return next(
-      new AppError('No post found with that id.', 404)
-    );
-  }
-
-  res.status(200).json({
-    message: 'success',
-    data: {
-      post,
-    },
-  });
-});
-
-exports.deletePost = catchAsync(async (req, res, next) => {
-  const post = await Post.findByIdAndDelete(req.params.id);
-
-  if (!post) {
-    return next(
-      new AppError('No post found with that id.', 404)
-    );
-  }
-
-  res.status(204).json({
-    message: 'success',
-    data: null,
-  });
-});
+exports.deletePost = factory.deleteOne(Post);
 
 exports.getPostStats = catchAsync(
   async (req, res, next) => {
     const stats = await Post.aggregate([
       {
         $group: {
-          _id: {
-            branch: '$branch',
-            year: '$year',
-            section: '$section',
-          },
+          _id: '$category',
           numPosts: { $sum: 1 },
         },
       },
