@@ -257,3 +257,9 @@ exports.restrictTo =
     }
     next();
   };
+
+exports.setUserId = (req, res, next) => {
+  req.body.user = req.user.id;
+  req.params.userId = req.user.id;
+  next();
+};

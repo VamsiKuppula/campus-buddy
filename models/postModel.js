@@ -69,14 +69,11 @@ const postSchema = new mongoose.Schema(
         message: 'Section must be either: a, b',
       },
     },
-    createdAt: {
-      type: Date,
-      default: Date.now(),
-    },
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true,
   }
 );
 /*
@@ -85,13 +82,13 @@ postSchema.virtual('curYear').get(function () {
   const curDate = new Date();
   return curDate.getFullYear() * 1 - this.year;
 });
-
+*/
 postSchema.virtual('responses', {
   ref: 'Response',
   foreignField: 'post',
   localField: '_id',
+  match: { parentResponse: { $eq: null } },
 });
-*/
 
 postSchema.index(
   {

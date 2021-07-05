@@ -8,9 +8,9 @@ exports.getPost = factory.getOne(Post, {
   path: 'responses',
   foreignField: 'post',
   localField: '_id',
+  match: { parentResponse: { $eq: null } },
 });
 exports.updatePost = factory.updateOne(Post);
-
 exports.deletePost = factory.deleteOne(Post);
 
 exports.getPostStats = catchAsync(

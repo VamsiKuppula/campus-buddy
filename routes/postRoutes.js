@@ -12,7 +12,10 @@ router.use(authController.protect);
 router
   .route('/')
   .get(postController.getAllPosts)
-  .post(postController.createPost);
+  .post(
+    authController.setUserId,
+    postController.createPost
+  );
 
 router
   .route('/post-stats')

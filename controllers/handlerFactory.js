@@ -4,9 +4,21 @@ const APIFeatures = require('../utils/apiFeatures');
 
 exports.deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
-    const doc = await Model.findByIdAndDelete(
-      req.params.id
-    );
+    let queryFilter = { _id: req.params.id };
+
+    // admin, hod can delete any one's document but normal user can only delete his own documents
+    if (
+      (req.user.role !== 'admin' ||
+        req.user.role !== 'hod') &&
+      Model.collection.collectionName !== 'schedules'
+    ) {
+      queryFilter = {
+        _id: req.params.id,
+        user: req.user.id,
+      };
+    }
+
+    const doc = await Model.findOneAndDelete(queryFilter);
 
     if (!doc) {
       return next(
@@ -22,8 +34,21 @@ exports.deleteOne = (Model) =>
 
 exports.updateOne = (Model) =>
   catchAsync(async (req, res, next) => {
-    const doc = await Model.findByIdAndUpdate(
-      req.params.id,
+    let queryFilter = { _id: req.params.id };
+
+    // admin, hod can update any one's document but normal user can only update his own documents
+    if (
+      (req.user.role !== 'admin' ||
+        req.user.role !== 'hod') &&
+      Model.collection.collectionName !== 'schedules'
+    ) {
+      queryFilter = {
+        _id: req.params.id,
+        user: req.user.id,
+      };
+    }
+    const doc = await Model.findOneAndUpdate(
+      queryFilter,
       req.body,
       {
         new: true,
@@ -83,6 +108,8 @@ exports.getAll = (Model) =>
     let filter = {};
     if (req.params.postId)
       filter = { post: req.params.postId };
+    if (req.params.userId)
+      filter = { user: req.params.userId };
     if (Model.collection.collectionName === 'responses') {
       filter = { ...filter, parentResponse: { $eq: null } };
     }

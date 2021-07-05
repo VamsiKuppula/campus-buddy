@@ -10,7 +10,8 @@ router
   .route('/')
   .get(responseController.getAllResponses)
   .post(
-    responseController.setPostUserIds,
+    responseController.setPostId,
+    authController.setUserId,
     responseController.createResponse
   );
 

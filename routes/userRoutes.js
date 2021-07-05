@@ -26,6 +26,12 @@ router.patch(
   authController.updatePassword
 );
 
+router.get(
+  '/me',
+  userController.getMe,
+  userController.getUser
+);
+
 router.patch(
   '/updateMe',
   authController.protect,

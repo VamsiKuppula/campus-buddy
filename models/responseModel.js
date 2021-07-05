@@ -32,6 +32,10 @@ const responseSchema = new mongoose.Schema(
     response: {
       type: String,
       required: [true, 'A response cannot be empty!'],
+      minlength: [
+        5,
+        'Response must have equal or more than 5 characters',
+      ],
     },
     parentResponse: {
       type: mongoose.Schema.ObjectId,
@@ -39,14 +43,11 @@ const responseSchema = new mongoose.Schema(
       default: null,
       required: false,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now(),
-    },
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true,
   }
 );
 

@@ -9,6 +9,9 @@ const hpp = require('hpp');
 const postRouter = require('./routes/postRoutes');
 const userRouter = require('./routes/userRoutes');
 const responseRouter = require('./routes/responseRoutes');
+const reminderRouter = require('./routes/reminderRoutes');
+const announcementRouter = require('./routes/announcementRoutes');
+const scheduleRouter = require('./routes/scheduleRoutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -53,6 +56,9 @@ app.use('/api', limiter);
 app.use('/api/v1/posts', postRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/responses', responseRouter);
+app.use('/api/v1/reminders', reminderRouter);
+app.use('/api/v1/announcements', announcementRouter);
+app.use('/api/v1/schedules', scheduleRouter);
 
 app.all('*', (req, res, next) => {
   const err = new AppError(
